@@ -1,0 +1,70 @@
+import time
+import random
+
+def difficulty(score):
+    if score < 10:
+        command = random.randint(1 , 100)
+        task = f"Please enter the number:  {command}"
+    else:
+        a = random.randint( 1 , 50 )
+        b = random.randint( 1 , 50 )
+        command = a + b
+        task = f"Calculate: {a} + {b}"
+    return command , task
+
+def calculate_time(time1):
+    return max(1 , 5  - time1 * 0.5)
+
+def streak_system( score , time1 , streak ):
+    if streak > 0 and streak % 3 == 0:
+        print("Streak! You are awarded additional time and bonus score")
+        time1 -= 4
+        score += 2
+    return score , time1 , streak
+
+lives = 5
+score = 0
+streak = 0
+time1 = 0
+while lives > 0:
+    moment =  calculate_time(time1)
+    command , task = difficulty(score)
+    
+    start = time.time()
+    try:
+        answer = int(input(f"{task} under {moment} seconds: "))
+    except ValueError:
+        print("Invalid characters you can only enter integers")
+        continue
+
+    end  = time.time() - start
+
+
+    if end > moment:
+        print(f"Too slow. It took {moment} seconds ")
+        lives -= 1
+        streak = 0
+        continue
+
+    score , time1 , streak = streak_system( score , time1 , streak )
+
+    if answer == command:
+        streak += 1
+        score += 1
+        time1 += 1
+    else:
+        lives -= 1
+        streak = 0
+        print(f"Wrong! You have {lives} lives ")
+    print(f"You have {score} scores")
+        
+print(f"You ran out of lives. You scored total {score} points")
+
+    
+
+
+
+
+
+
+
