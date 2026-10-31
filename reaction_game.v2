@@ -1,0 +1,138 @@
+import csv
+import random
+import time
+
+import pandas as pd
+
+option = int(input("1. Play the Game  2. See your scores: "))
+
+if option == 1:
+
+    # Difficulty
+    def difficulty_system(score):
+        if score == 0:
+            command = random.randint(1, 100)
+            task = f"Enter {command}"
+
+        elif score <= 10:
+            a = random.randint(1, 10)
+            b = random.randint(1, 10)
+            command = a + b
+            task = f"Calculate: {a} + {b}: "
+
+        elif score <= 30:
+            os = random.randint(1, 3)
+            a = random.randint(1, 30)
+            b = random.randint(1, 30)
+
+            if os == 1:
+                if a > b:
+                    command = a - b
+                    task = f"Calculate: {a} - {b}: "
+                else:
+                    command = a + b
+                    task = f"Calculate: {a} + {b}: "
+            else:
+                command = a + b
+                task = f"Calculate: {a} + {b}: "
+
+        else:
+            a = random.randint(1, 100)
+            b = random.randint(1, 100)
+            os = random.randint(1, 3)
+
+            if os == 1:
+                if a > b:
+                    command = a - b
+                    task = f"Calculate: {a} - {b}: "
+                else:
+                    command = a + b
+                    task = f"Calculate: {a} + {b}: "
+            else:
+                command = a + b
+                task = f"Calculate: {a} + {b}: "
+
+        return command, task
+
+    # Time
+    def time_system(time1):
+        return max(1, 5 - time1 * 0.5)
+
+    # Streak
+    def streak_system(streak, score, time1):
+        if streak % 3 == 0 and streak > 0:
+            print("STREAK!!! You will be awarded with additional score and bonus time")
+            score += 2
+            time1 -= 4
+
+        return score, time1, streak
+
+    # The Game
+    score = 0
+    lives = 5
+    time1 = 0
+    streak = 0
+    stats = []
+
+    while lives > 0:
+        moment = time_system(time1)
+        command, task = difficulty_system(score)
+
+        start = time.time()
+
+        try:
+            answer = int(input(f"{task} in {round(moment, 2)} seconds: "))
+        except ValueError:
+            print("Invalid characters. You can only use integers")
+            continue
+
+        end = time.time() - start
+
+        # Check the time
+        if end > moment:
+            print(f"Too slow. You spent {round(end, 2)} seconds on the exercise")
+            lives -= 1
+            streak = 0
+            continue
+
+        # Check if the answer is wrong
+        if command == answer:
+            print("Correct!")
+            score += 1
+            time1 += 1
+            streak += 1
+
+        else:
+            streak = 0
+            lives -= 1
+
+        print(f"You have {lives} lives and {score} points")
+
+        score, time1, streak = streak_system(streak, score, time1)
+
+    print(f"You ran out of lives. You scored {score} points")
+
+    try:
+      df = pd.read_csv("reaction.csv")
+
+      if df.empty:
+          game = 1
+      else:
+          game = int(df["game"].max())+ 1
+    except(FileNotFoundError, pd.errors.EmptyDataError):
+        game = 1
+
+    with open("reaction.csv" , "a") as file:
+        writer = csv.DictWriter(file, fieldnames = (["game" , "score"]))
+        if game == 1:
+            writer.writeheader()
+        writer.writerow({"game": game , "score": score})
+
+elif option == 2:
+    df = pd.read_csv("reaction.csv")
+    print(f"Average score {df["score"].mean}")
+    print(f"Highest score is {df['score'].max()}")
+    
+
+else:
+    print("Invalid Choice")
