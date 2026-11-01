@@ -72,6 +72,7 @@ if option == 1:
     lives = 5
     time1 = 0
     streak = 0
+    game = 0
     stats = []
 
     while lives > 0:
@@ -113,25 +114,22 @@ if option == 1:
     print(f"You ran out of lives. You scored {score} points")
 
     try:
-      df = pd.read_csv("reaction.csv")
-
-      if df.empty:
-          game = 1
-      else:
-          game = int(df["game"].max())+ 1
+        df = pd.read_csv("reaction.csv")
+        if df.empty:
+            game = 1
+        else:
+            game = int(df["game"].max()) + 1    
     except(FileNotFoundError, pd.errors.EmptyDataError):
         game = 1
 
     with open("reaction.csv" , "a") as file:
-        writer = csv.DictWriter(file, fieldnames = (["game" , "score"]))
-        if game == 1:
-            writer.writeheader()
-        writer.writerow({"game": game , "score": score})
-
+        writer = csv.DictWriter(file , fieldnames = (["game" , "score"]))
+        writer.writerow({"game": game, "score": score})
 elif option == 2:
     df = pd.read_csv("reaction.csv")
-    print(f"Average score {df["score"].mean}")
+    print(f"Average score {round(df['score'].mean() , 2)}")
     print(f"Highest score is {df['score'].max()}")
+    print(df)
     
 
 else:
